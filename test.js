@@ -2,16 +2,23 @@ document.getElementById("test").addEventListener('click', () => {
     console.log("Popup DOM fully loaded and parsed");
 
     function modifyDOM() {
-        //You can play with your DOM here or check URL against your regex
-        sku = document.getElementsByClassName('editor_label_code')[0].innerHTML;
-        return sku
+        // Page content
+        var blacklist = ["22522-01", "23542-01"];
+        var sku_list = '';
+        var visible_cards = document.getElementsByClassName('itemOuter');
+        for (var i = 0; i < visible_cards.length; i++) {
+            sku = visible_cards[i].getElementsByClassName('gridDescriptionDiv')[0].innerText.replace('# ID','').trim();
+            if ( blacklist.indexOf(sku) != -1 ) {
+                visible_cards[i].getElementsByClassName('gridItemMainDiv')[0].style.backgroundColor = 'red';
+            }
+        }
+        return sku_list;
     }
 
-    //We have permission to access the activeTab, so we can call chrome.tabs.executeScript:
     chrome.tabs.executeScript({
-        code: '(' + modifyDOM + ')();' //argument here is a string but function.toString() returns function's code
+        code: '(' + modifyDOM + ')();'
     }, (results) => {
-        //Here we have just the innerHTML and not DOM structure
+        // Popup content
         document.getElementById('debug_result').innerHTML = results[0];
     });
 });
